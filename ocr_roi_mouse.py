@@ -6,20 +6,33 @@ import keyboard
 
 from PIL import Image
 
-session_texts = []
-last_text = ""
-
+# =========================
+# CONFIG
+# =========================
 #Tesseract path
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-#Phone screenshot
+# =========================
+# STATE
+# =========================
+condition_texts = []
+options = []
+options_index = 0
+mode = "condition"
+last_text = ""
+
+# =========================
+# PHONE SCREENSHOT
+# =========================
 def make_screenshot():
     with open("screen.png", "wb") as f:
         subprocess.run(
             ["adb", "exec-out", "screencap", "-p"],
             stdout=f
         )
-
+# =========================
+# ROI SELECTION (SCALED)
+# =========================
 def select_roi_scaled(image_path, scale=0.5):
     img = cv2.imread(image_path)
 
@@ -47,31 +60,17 @@ def select_roi_scaled(image_path, scale=0.5):
 
     return "cropped.png"
 
-def ocr_and_store(image_path):
-    global last_text
-
-    img = Image.open(image_path)
-
-    raw_text = pytesseract.image_to_string(img, lang="eng+rus")
-
-    cleaned = clean_text(raw_text)
-    processed = remove_overlap(cleaned, last_text)
-    last_text = cleaned
-
-
-    session_texts.append(processed)
-
-    print("\n=== OCR RESULT ===")
-    print(processed)
-    print("==================\n")
-
-#Cleans spaces and empty lines
+# =========================
+# TEXT CLEANING
+# =========================
 def clean_text(text):
     lines = [line.strip() for line in text.split("\n")]
     lines = [line for line in lines if line]
-
     return "\n".join(lines)
 
+# =========================
+# OVERLAP REMOVAL (SCROLL FIX)
+# =========================
 def remove_overlap (new_text, last_text):
     if not last_text:
         return new_text
@@ -86,40 +85,105 @@ def remove_overlap (new_text, last_text):
             overlap = i
     return "\n".join(new_lines[overlap:])
 
+# =========================
+# OCR SMART CORE
+# =========================
+def ocr(image_path):
+    img = Image.open(image_path)
+    return pytesseract.image_to_string(img, lang="eng+rus")
+
+# =========================
+# MODE HANDLING
+# =========================
+def switch_mode(new_mode):
+    global mode, option_index
+    mode = new_mode
+    print(f"\n MODE: {mode}\n")
+    if mode == "options":
+        options.clear()
+        option_index = 0
+# =========================
+# SMART OCR PIPELINE
+# =========================
+
 def pipeline():
-    print("Capturing screenshot...")
+    global last_text
+
+    print(f"Screenshot in mode: {mode}")
+
     make_screenshot()
 
-    print("Select area with mouse...")
     cropped_path = select_roi_scaled("screen.png")
 
-    print("OCR...")
+    raw_text = ocr(cropped_path)
 
-    ocr_and_store(cropped_path)
+    cleaned = clean_text(raw_text)
 
-    print("Copied to clipboard!")
+    processed = remove_overlap(cleaned, last_text)
 
-def finish_session():
-    full_text = "\n".join(session_texts)
+    last_text = cleaned
 
-    #Final cleanup
-    lines = [line.strip() for line in full_text.split("\n")]
-    lines = [line for line in lines if line]
+    if mode == "condition":
+        condition_texts.append(processed)
+        print("CONDITION ADDED")
 
-    final_text = "\n".join(lines)
+    elif mode == "options":
+        handle_option(processed)
 
-    pyperclip.copy(final_text)
+# =========================
+# OPTIONS HANDLER (ONE BY ONE)
+# =========================
+def handle_option(text):
+    global option_index
 
-    print("\n SMART FINAL DOCUMENT:\n")
-    print(final_text)
-    print("\nCopied to clipboard!")
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
 
-print("OCR HOTKEY ACTIVE")
-print("Press F8 to capture phone screen")
-print("Press ESC to exit")
+    if not lines:
+        return
 
-#Hotkeys
+    # берём только первый “значимый” кусок
+    option_text = lines[0]
+
+    option_index += 1
+
+    formatted = f"{option_index}) {option_text}"
+
+    options.append(formatted)
+
+    print(f"OPTION {option_index} ADDED")
+
+# =========================
+# FINAL OUTPUT
+# =========================
+
+def finish():
+    condition = "\n".join(condition_texts)
+
+    result = condition + "\n\n" + "\n".join(options)
+
+    pyperclip.copy(result)
+
+    print("\nFINAL RESULT:\n")
+    print(result)
+    print("\nCopied to clipboard!\n")
+
+    condition_texts.clear()
+    options.clear()
+
+# =========================
+# HOTKEYS
+# =========================
+
+print("OCR TEST TOOL ACTIVE")
+print("F7 = condition mode")
+print("F8 = capture + OCR")
+print("F9 = options mode (one-by-one)")
+print("F10 = finish & copy")
+print("ESC = exit")
+
+keyboard.add_hotkey("F7", lambda: switch_mode("condition"))
 keyboard.add_hotkey("F8", pipeline)
-keyboard.add_hotkey("F9", finish_session)
-#Exit
+keyboard.add_hotkey("F9", lambda: switch_mode("options"))
+keyboard.add_hotkey("F10", finish)
+
 keyboard.wait("esc")
