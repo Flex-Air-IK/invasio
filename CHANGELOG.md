@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.1] - 2026-06-21
+
+### Added
+- GUI interface for OCR tool
+
 ## [v1.0] - 2026-06-21
 ### Added
 - ADB screenshot capture
