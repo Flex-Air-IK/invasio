@@ -2,24 +2,60 @@ import subprocess
 import cv2
 import pytesseract
 import pyperclip
-import keyboard
+import tkinter as tk
 
+from tkinter import messagebox
 from PIL import Image
-
-# =========================
-# CONFIG
-# =========================
-#Tesseract path
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 # =========================
 # STATE
 # =========================
 condition_texts = []
 options = []
-options_index = 0
+option_index = 0
 mode = "condition"
 last_text = ""
+
+# =========================
+# MODE HANDLING
+# =========================
+def switch_mode(new_mode):
+    global mode
+    mode = new_mode
+    print(f"\n MODE: {mode}\n")
+
+# =========================
+# SMART OCR PIPELINE
+# =========================
+def pipeline():
+    global last_text
+
+    print(f"Screenshot in mode: {mode}")
+
+    make_screenshot()
+
+    cropped_path = select_roi_scaled("screen.png")
+
+    raw_text = ocr(cropped_path)
+
+    cleaned = clean_text(raw_text)
+
+    processed = remove_overlap(cleaned, last_text)
+
+    last_text = cleaned
+
+    if mode == "condition":
+        condition_texts.append(processed)
+        print("CONDITION ADDED")
+
+    elif mode == "options":
+        handle_option(processed)
+
+# =========================
+# CONFIG
+# =========================
+#Tesseract path
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 # =========================
 # PHONE SCREENSHOT
@@ -93,44 +129,6 @@ def ocr(image_path):
     return pytesseract.image_to_string(img, lang="eng+rus")
 
 # =========================
-# MODE HANDLING
-# =========================
-def switch_mode(new_mode):
-    global mode, option_index
-    mode = new_mode
-    print(f"\n MODE: {mode}\n")
-    if mode == "options":
-        options.clear()
-        option_index = 0
-# =========================
-# SMART OCR PIPELINE
-# =========================
-
-def pipeline():
-    global last_text
-
-    print(f"Screenshot in mode: {mode}")
-
-    make_screenshot()
-
-    cropped_path = select_roi_scaled("screen.png")
-
-    raw_text = ocr(cropped_path)
-
-    cleaned = clean_text(raw_text)
-
-    processed = remove_overlap(cleaned, last_text)
-
-    last_text = cleaned
-
-    if mode == "condition":
-        condition_texts.append(processed)
-        print("CONDITION ADDED")
-
-    elif mode == "options":
-        handle_option(processed)
-
-# =========================
 # OPTIONS HANDLER (ONE BY ONE)
 # =========================
 def handle_option(text):
@@ -141,8 +139,7 @@ def handle_option(text):
     if not lines:
         return
 
-    # берём только первый “значимый” кусок
-    option_text = lines[0]
+    option_text = " ".join(lines)
 
     option_index += 1
 
@@ -171,19 +168,150 @@ def finish():
     options.clear()
 
 # =========================
-# HOTKEYS
+# UPDATE THE PREVIEW IN GUI
 # =========================
+def update_preview():
+    preview = ""
 
-print("OCR TEST TOOL ACTIVE")
-print("F7 = condition mode")
-print("F8 = capture + OCR")
-print("F9 = options mode (one-by-one)")
-print("F10 = finish & copy")
-print("ESC = exit")
+    if condition_texts:
+        preview += "\n".join(condition_texts)
 
-keyboard.add_hotkey("F7", lambda: switch_mode("condition"))
-keyboard.add_hotkey("F8", pipeline)
-keyboard.add_hotkey("F9", lambda: switch_mode("options"))
-keyboard.add_hotkey("F10", finish)
+    if options:
+        preview += "\n\n"
+        preview += "\n".join(options)
 
-keyboard.wait("esc")
+    preview_text.delete("1.0", tk.END)
+    preview_text.insert(tk.END, preview)
+
+# =========================
+# GUI SECTION
+# =========================
+def add_condition():
+    switch_mode("condition")
+    pipeline()
+
+def add_option():
+    switch_mode("options")
+    pipeline()
+
+def build_result():
+    finish()
+
+# =========================
+# BUTTON LOGIC
+# =========================
+def gui_add_condition():
+    switch_mode("condition")
+    pipeline()
+    refresh_ui()
+
+def gui_add_option():
+    switch_mode("options")
+    pipeline()
+    refresh_ui()
+
+def gui_finish():
+    finish()
+
+    messagebox.showinfo(
+        "Done",
+        "Result copied to clipboard"
+    )
+
+def clear_all():
+    global option_index, last_text
+
+    condition_texts.clear()
+    options.clear()
+
+    option_index = 0
+    last_text = ""
+
+    status_label.config(text="Cleared")
+    preview_text.delete("1.0", tk.END)
+# =========================
+# GUI WINDOW CONFIG
+# =========================
+root = tk.Tk()
+root.title("'INVASIO' - OCR Tool")
+root. geometry("1000x600")
+
+status_label = tk.Label(
+    root,
+    text="Ready",
+    font=("Arial", 30)
+)
+status_label.pack(pady=10)
+
+btn_condition = tk.Button(
+    root,
+    text="Добавить условие [Add condition]",
+    width=35,
+    font=("Arial", 18),
+    command=gui_add_condition
+)
+btn_condition.pack(pady=5)
+
+btn_option = tk.Button(
+    root,
+    text="Добавить вариант [Add option]",
+    width=35,
+    font=("Arial", 18),
+    command=gui_add_option
+)
+btn_option.pack(pady=5)
+
+btn_finish = tk.Button(
+    root,
+    text="Собрать результат [Final Result]",
+    width=35,
+    font=("Arial", 18),
+    command=gui_finish
+)
+btn_finish.pack(pady=5)
+
+btn_clear = tk.Button(
+    root,
+    text="Очистить все [Clear Selection]",
+    width=35,
+    font=("Arial", 18),
+    command=clear_all
+)
+btn_clear.pack(pady=5)
+
+preview_label = tk.Label(
+    root,
+    text="Предпросмотр",
+    font=("Arial", 15)
+)
+preview_label.pack(pady=(15,5))
+
+# =========================
+# GUI REFRESH
+# =========================
+def refresh_ui():
+    update_preview()
+    status_label.config(
+        text=f"Condition fragments: {len(condition_texts)} | Options: {len(options)}"
+    )
+
+# =========================
+# GUI PREVIEW WINDOW
+# =========================
+frame = tk.Frame(root)
+frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+scrollbar = tk.Scrollbar(frame)
+
+preview_text = tk.Text(
+    frame,
+    font=("Consolas", 11),
+    yscrollcommand=scrollbar.set
+)
+
+scrollbar.config(command=preview_text.yview)
+
+scrollbar.pack(side="right", fill="y")
+preview_text.pack(side="left", fill="both", expand=True)
+
+root.mainloop()
