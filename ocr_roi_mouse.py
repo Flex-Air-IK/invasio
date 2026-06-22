@@ -296,7 +296,7 @@ def set_hotkey(action, key):
     if not key:
         return
 
-    if key in hotkeys.values():
+    if is_key_taken(key, ignore_action=action):
         messagebox.showwarning(
             "Кнопка уже назначена/Hotkey already used",
             f"{key} уже назначена!/{key} already assigned!"
@@ -358,6 +358,14 @@ def key_handler(event):
         if new_key == "Escape":
             return
 
+        if is_key_taken(new_key, ignore_action=action):
+            messagebox.showwarning(
+                "Кнопка уже назначена/Button is already in use",
+                f"{new_key} уже используется!/{new_key} already in use!"
+            )
+            waiting_hotkey_action = None
+            return
+
         hotkeys[action] = new_key
         label_widget.config(text=new_key)
 
@@ -379,7 +387,11 @@ def key_handler(event):
     elif key == hotkeys["clear"]:
         clear_all()
 
-
+def is_key_taken(key, ignore_action=None):
+    for action, k in hotkeys.items():
+        if action != ignore_action and k == key:
+            return True
+    return False
 # =========================
 # GUI REFRESH
 # =========================
