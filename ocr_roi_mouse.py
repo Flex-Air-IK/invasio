@@ -4,6 +4,8 @@ import pytesseract
 import pyperclip
 import tkinter as tk
 import json
+import webbrowser
+import os
 
 from tkinter import messagebox
 from PIL import Image
@@ -26,6 +28,22 @@ def switch_mode(new_mode):
     mode = new_mode
     print(f"\n MODE: {mode}\n")
 
+# =========================
+# RESOURCES
+# =========================
+TELEGRAM_URL = "https://t.me/IK_Flex_Air"
+YOUTUBE_URL = "https://www.youtube.com/@FlexAir-pwn"
+
+def open_link(url):
+    webbrowser.open(url)
+
+def copy_link(url):
+    pyperclip.copy(url)
+
+    messagebox.showinfo(
+        "Copied",
+        "Link copied to clipboard"
+    )
 # =========================
 # SMART OCR PIPELINE
 # =========================
@@ -226,9 +244,25 @@ def clear_all():
 root = tk.Tk()
 main_frame = tk.Frame(root)
 hotkey_frame = tk.Frame(root)
-root.title("'INVASIO' - OCR Tool")
+social_frame = tk.Frame(root)
+social_frame.place(x=800, y=10)
+
+root.title("'INVASIO' - OCR Tool by Flex Air")
 root.geometry("1000x600")
 
+telegram_icon = tk.PhotoImage(
+    file=os.path.join("icons", "telegram_icon.png")
+)
+youtube_icon = tk.PhotoImage(
+    file=os.path.join("icons", "YT_icon.png")
+)
+copy_icon = tk.PhotoImage(
+    file=os.path.join("icons", "Copy_icon.png")
+)
+
+# =========================
+# GUI WINDOW CONFIG
+# =========================
 status_label = tk.Label(
     main_frame,
     text="Ready",
@@ -280,6 +314,47 @@ preview_label = tk.Label(
 preview_label.pack(pady=(15,5))
 
 current_screen = "main"
+
+# =========================
+# SOCIALS
+# =========================
+socials_row = tk.Frame(social_frame)
+socials_row.pack(anchor="w", pady=2)
+
+btn_telegram=tk.Button(
+    socials_row,
+    image=telegram_icon,
+    command=lambda: open_link(TELEGRAM_URL)
+)
+btn_telegram.pack(side="left")
+
+btn_copy_tg = tk.Button(
+    socials_row,
+    image=copy_icon,
+    command=lambda: copy_link(TELEGRAM_URL)
+)
+btn_copy_tg.pack(side="left", padx=5)
+
+btn_youtube = tk.Button(
+    socials_row,
+    image=youtube_icon,
+    command=lambda: open_link(YOUTUBE_URL)
+)
+btn_youtube.pack(side="left", padx=(20, 0))
+
+btn_copy_yt = tk.Button(
+    socials_row,
+    image=copy_icon,
+    command=lambda: copy_link(YOUTUBE_URL)
+)
+btn_copy_yt.pack(side="left", padx=5)
+
+btn_telegram.image = telegram_icon
+btn_youtube.image = youtube_icon
+btn_copy_tg.image = copy_icon
+btn_copy_yt.image = copy_icon
+
+
 # =========================
 # HOTKEYS
 # =========================
