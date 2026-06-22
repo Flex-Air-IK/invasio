@@ -1,0 +1,8 @@
+{
+    "hotkeys": {
+        "condition": "F1",
+        "option": "F2",
+        "finish": "F3",
+        "clear": "F4"
+    }
+}

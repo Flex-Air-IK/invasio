@@ -3,6 +3,7 @@ import cv2
 import pytesseract
 import pyperclip
 import tkinter as tk
+import json
 
 from tkinter import messagebox
 from PIL import Image
@@ -288,7 +289,41 @@ hotkeys = {
     "finish": "F3",
     "clear": "F4"
 }
+SETTINGS_FILE = "settings.json"
 
+def save_settings():
+    data = {
+        "hotkeys": hotkeys
+    }
+    with open(
+        SETTINGS_FILE,
+        "w",
+        encoding="utf-8"
+    ) as f:
+        json.dump(
+            data,
+            f,
+            ensure_ascii=False,
+            indent=4
+        )
+
+def load_settings():
+    global hotkeys
+
+    try:
+        with open(
+            SETTINGS_FILE,
+            "r",
+            encoding="utf-8"
+        ) as f:
+            data = json.load(f)
+            if "hotkeys" in data:
+                hotkeys.update(data["hotkeys"])
+
+    except (FileNotFoundError, json.JSONDecodeError):
+        save_settings()
+
+load_settings()
 
 def set_hotkey(action, key):
     key = key.strip().upper()
@@ -367,6 +402,7 @@ def key_handler(event):
             return
 
         hotkeys[action] = new_key
+        save_settings()
         label_widget.config(text=new_key)
 
         waiting_hotkey_action = None
