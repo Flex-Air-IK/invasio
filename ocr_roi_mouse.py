@@ -44,6 +44,64 @@ def copy_link(url):
         "Copied",
         "Link copied to clipboard"
     )
+def copy_text(text):
+    pyperclip.copy(text)
+    messagebox.showinfo("Copied", "Address copied to clipboard")
+
+def copy_address(address, widget):
+    pyperclip.copy(address)
+    widget.tooltip_label.config(
+        text="Copied!"
+    )
+
+    widget.after(
+        1500,
+        lambda: widget.tooltip_label.config(
+            text="Copy to clipboard"
+        )
+    )
+
+# =========================
+# Tooltip
+# =========================
+def show_tooltip(event, text):
+
+    widget = event.widget
+
+    widget.tooltip_label = tk.Label(
+        root,
+        text=text,
+        bg="#ffffe0",
+        relief="solid",
+        borderwidth=1,
+        font=("Arial", 9)
+    )
+
+    widget.tooltip_label.place(
+        x=event.x_root - root.winfo_rootx() + 15,
+        y=event.y_root - root.winfo_rooty() + 15
+    )
+
+
+def move_tooltip(event):
+
+    widget = event.widget
+
+    if hasattr(widget, "tooltip_label"):
+
+        widget.tooltip_label.place(
+            x=event.x_root - root.winfo_rootx() + 15,
+            y=event.y_root - root.winfo_rooty() + 15
+        )
+
+
+def hide_tooltip(event):
+
+    widget = event.widget
+
+    if hasattr(widget, "tooltip_label"):
+        widget.tooltip_label.destroy()
+
 # =========================
 # SMART OCR PIPELINE
 # =========================
@@ -245,19 +303,37 @@ root = tk.Tk()
 main_frame = tk.Frame(root)
 hotkey_frame = tk.Frame(root)
 social_frame = tk.Frame(root)
+donate_frame = tk.Frame(root)
 social_frame.place(x=800, y=10)
 
 root.title("'INVASIO' - OCR Tool by Flex Air")
 root.geometry("1000x600")
+
+btc_icon = tk.PhotoImage(file="icons/btc_icon.png")
+# noinspection SpellCheckingInspection
+eth_icon = tk.PhotoImage(file="icons/etherium_icon.png")
+bnb_icon = tk.PhotoImage(file="icons/bnb_icon.png")
+sol_icon = tk.PhotoImage(file="icons/solana_icon.png")
+ton_icon = tk.PhotoImage(file="icons/ton_icon.png")
+tron_icon = tk.PhotoImage(file="icons/tron_icon.png")
+
+# noinspection SpellCheckingInspection
+DONATE_DATA = [
+    ("BTC", btc_icon, "bc1qnjv8d2ecf3uwwugdf3jlxyc020e2ztc8s0zghv"),
+    ("ETH (any token)", eth_icon, "0x108e08febfbe3e47a9c15e484fd6587f4a0c6279"),
+    ("BNB (any token)", bnb_icon, "0x108e08febfbe3e47a9c15e484fd6587f4a0c6279"),
+    ("SOL (any token)", sol_icon, "GEgnqADD4WJTDz1syRMyaK9qjn2jhhEknhreoZwWXT9T"),
+    ("TON (any token)", ton_icon, "UQBZb8OHkXr08m1CWM_eGX40TMbeIUAVEWQeMLKl8RWZ2462"),
+    ("TRX (any token)", tron_icon, "TJxdGZTtp9MeXF2EijYAR4BK5wNH99kJgW"),
+]
+
+copy_icon = tk.PhotoImage(file="icons/Copy_icon.png")
 
 telegram_icon = tk.PhotoImage(
     file=os.path.join("icons", "telegram_icon.png")
 )
 youtube_icon = tk.PhotoImage(
     file=os.path.join("icons", "YT_icon.png")
-)
-copy_icon = tk.PhotoImage(
-    file=os.path.join("icons", "Copy_icon.png")
 )
 
 # =========================
@@ -315,6 +391,24 @@ preview_label.pack(pady=(15,5))
 
 current_screen = "main"
 
+def show_donate():
+    global current_screen
+    current_screen = "donate"
+
+    main_frame.pack_forget()
+    hotkey_frame.pack_forget()
+    build_donate_screen()
+
+    donate_frame.pack(fill="both", expand=True)
+
+btn_donate = tk.Button(
+    main_frame,
+    text="Donate",
+    font=("Arial", 15),
+    command=show_donate
+)
+btn_donate.place(x=110, y=10)
+
 # =========================
 # SOCIALS
 # =========================
@@ -353,7 +447,6 @@ btn_telegram.image = telegram_icon
 btn_youtube.image = youtube_icon
 btn_copy_tg.image = copy_icon
 btn_copy_yt.image = copy_icon
-
 
 # =========================
 # HOTKEYS
@@ -559,11 +652,17 @@ def build_hotkey_screen():
     create_hotkey_row("Finish", "finish")
     create_hotkey_row("Clear", "clear")
 
-    tk.Button(hotkey_frame, text="Назад [Back]", command=show_main).pack(pady=20)
+    tk.Button(
+        hotkey_frame,
+        text="Назад/Back",
+        command=show_main,
+        font = ("Consolas", 20)
+    ).pack(pady=20)
 
 def show_main():
     global current_screen
     current_screen = "main"
+    donate_frame.pack_forget()
     hotkey_frame.pack_forget()
     main_frame.pack(fill="both", expand=True)
 
@@ -575,16 +674,82 @@ def show_hotkeys():
     hotkey_frame.pack(fill="both", expand=True)
 
 def on_esc(event):
+    if current_screen in ["hotkeys", "donate"]:
+        show_main()
+
     if waiting_hotkey_action is not None:
         return
 
     if current_screen == "hotkeys":
         show_main()
 
+# =========================
+# DONATE SCREEN
+# =========================
+def build_donate_screen():
+    for w in donate_frame.winfo_children():
+        w.destroy()
+
+    tk.Label(
+        donate_frame,
+        text="Донаты/Donations",
+        font=("Arial", 22)
+    ).pack(pady=10)
+
+    for name, icon, address in DONATE_DATA:
+        row = tk.Frame(donate_frame)
+        row.pack(anchor="center", pady=5)
+
+        icon_label = tk.Label(row, image=icon)
+        icon_label.pack(side="left", padx=5)
+
+        addr_label = tk.Label(
+            row,
+            text=address,
+            fg="blue",
+            cursor="hand2",
+            font=("Consolas", 11)
+        )
+        addr_label.pack(side="left", padx=5)
+
+        addr_label.bind(
+            "<Enter>",
+            lambda e: show_tooltip(
+                e,
+                "Copy to clipboard"
+            )
+        )
+
+        addr_label.bind(
+            "<Leave>",
+            hide_tooltip
+        )
+
+        addr_label.bind(
+            "<Motion>",
+            move_tooltip
+        )
+
+        addr_label.bind(
+            "<Button-1>",
+            lambda e,
+                   addr=address,
+                   w=addr_label:
+            copy_address(addr, w)
+        )
+
+    tk.Button(
+        donate_frame,
+        text="Назад/Back",
+        command=show_main,
+        font = ("Consolas", 20)
+    ).pack(pady=20)
+
 hotkey_btn = tk.Button(
     main_frame,
     text="Hotkeys",
-    command=show_hotkeys
+    command=show_hotkeys,
+    font = ("Arial", 15)
 )
 hotkey_btn.place(x=10, y=10)
 
