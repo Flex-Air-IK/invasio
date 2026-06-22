@@ -19,6 +19,17 @@ option_index = 0
 mode = "condition"
 last_text = ""
 waiting_hotkey_action = None
+# =========================
+# THEME
+# =========================
+BG = "#1e1e1e"          # фон окна
+CARD = "#2d2d2d"        # карточки/панели
+BTN = "#3a3a3a"         # кнопки
+BTN_HOVER = "#505050"   # кнопки при наведении
+TEXT = "#ffffff"        # белый текст
+ACCENT = "#4CAF50"      # зеленый акцент
+PREVIEW_BG = "#252526"  # фон preview
+PREVIEW_TEXT = "#d4d4d4"
 
 # =========================
 # MODE HANDLING
@@ -300,14 +311,50 @@ def clear_all():
 # GUI WINDOW CONFIG
 # =========================
 root = tk.Tk()
-main_frame = tk.Frame(root)
-hotkey_frame = tk.Frame(root)
-social_frame = tk.Frame(root)
-donate_frame = tk.Frame(root)
+root.configure(bg=BG)
+
+main_frame = tk.Frame(
+    root,
+    bg=BG
+)
+
+hotkey_frame = tk.Frame(
+    root,
+    bg=BG
+)
+
+social_frame = tk.Frame(
+    root,
+    bg=BG
+)
+donate_frame = tk.Frame(
+    root,
+    bg=BG
+)
 social_frame.place(x=800, y=10)
 
 root.title("'INVASIO' - OCR Tool by Flex Air")
 root.geometry("1000x600")
+
+title_label = tk.Label(
+    main_frame,
+    text="INVASIO OCR TOOL",
+    font=("Segoe UI", 26, "bold"),
+    bg=BG,
+    fg=TEXT
+)
+
+title_label.pack(pady=(10, 0))
+
+subtitle_label = tk.Label(
+    main_frame,
+    text="Fast OCR for Mobile Screens by IK of Flex Air",
+    font=("Segoe UI", 10),
+    bg=BG,
+    fg="#aaaaaa"
+)
+
+subtitle_label.pack(pady=(0, 15))
 
 btc_icon = tk.PhotoImage(file="icons/btc_icon.png")
 # noinspection SpellCheckingInspection
@@ -342,7 +389,9 @@ youtube_icon = tk.PhotoImage(
 status_label = tk.Label(
     main_frame,
     text="Ready",
-    font=("Arial", 30)
+    font=("Arial", 30),
+    bg=BG,
+    fg=ACCENT
 )
 status_label.pack(pady=10)
 
@@ -351,7 +400,14 @@ btn_condition = tk.Button(
     text="Добавить условие/Add Condition",
     width=35,
     font=("Arial", 18),
-    command=gui_add_condition
+    command=gui_add_condition,
+    bg=BTN,
+    fg=TEXT,
+    activebackground=BTN_HOVER,
+    activeforeground=TEXT,
+    relief="flat",
+    borderwidth=0,
+    cursor="hand2"
 )
 btn_condition.pack(pady=5)
 
@@ -360,7 +416,14 @@ btn_option = tk.Button(
     text="Добавить вариант/Add option",
     width=35,
     font=("Arial", 18),
-    command=gui_add_option
+    command=gui_add_option,
+    bg=BTN,
+    fg=TEXT,
+    activebackground=BTN_HOVER,
+    activeforeground=TEXT,
+    relief="flat",
+    borderwidth=0,
+    cursor="hand2"
 )
 btn_option.pack(pady=5)
 
@@ -369,7 +432,14 @@ btn_finish = tk.Button(
     text="Собрать результат/Final Result",
     width=35,
     font=("Arial", 18),
-    command=gui_finish
+    command=gui_finish,
+    bg=BTN,
+    fg=TEXT,
+    activebackground=BTN_HOVER,
+    activeforeground=TEXT,
+    relief="flat",
+    borderwidth=0,
+    cursor="hand2"
 )
 btn_finish.pack(pady=5)
 
@@ -378,14 +448,23 @@ btn_clear = tk.Button(
     text="Очистить все/Clear Selection",
     width=35,
     font=("Arial", 18),
-    command=clear_all
+    command=clear_all,
+    bg=BTN,
+    fg=TEXT,
+    activebackground=BTN_HOVER,
+    activeforeground=TEXT,
+    relief="flat",
+    borderwidth=0,
+    cursor="hand2"
 )
 btn_clear.pack(pady=5)
 
 preview_label = tk.Label(
     main_frame,
     text="Предпросмотр",
-    font=("Arial", 15)
+    font=("Arial", 15),
+    bg=BG,
+    fg=TEXT
 )
 preview_label.pack(pady=(15,5))
 
@@ -405,41 +484,79 @@ btn_donate = tk.Button(
     main_frame,
     text="Donate",
     font=("Arial", 15),
-    command=show_donate
+    command=show_donate,
+    bg=BTN,
+    fg=TEXT,
+    activebackground=BTN_HOVER,
+    activeforeground=TEXT,
+    relief="flat",
+    borderwidth=0,
+    cursor="hand2"
 )
 btn_donate.place(x=110, y=10)
 
 # =========================
 # SOCIALS
 # =========================
-socials_row = tk.Frame(social_frame)
+socials_row = tk.Frame(
+    social_frame,
+    bg=BG
+)
 socials_row.pack(anchor="w", pady=2)
 
 btn_telegram=tk.Button(
     socials_row,
     image=telegram_icon,
-    command=lambda: open_link(TELEGRAM_URL)
+    command=lambda: open_link(TELEGRAM_URL),
+    bg=BTN,
+    fg=TEXT,
+    activebackground=BTN_HOVER,
+    activeforeground=TEXT,
+    relief="flat",
+    borderwidth=0,
+    cursor="hand2"
 )
 btn_telegram.pack(side="left")
 
 btn_copy_tg = tk.Button(
     socials_row,
     image=copy_icon,
-    command=lambda: copy_link(TELEGRAM_URL)
+    command=lambda: copy_link(TELEGRAM_URL),
+    bg=BTN,
+    fg=TEXT,
+    activebackground=BTN_HOVER,
+    activeforeground=TEXT,
+    relief="flat",
+    borderwidth=0,
+    cursor="hand2"
 )
 btn_copy_tg.pack(side="left", padx=5)
 
 btn_youtube = tk.Button(
     socials_row,
     image=youtube_icon,
-    command=lambda: open_link(YOUTUBE_URL)
+    command=lambda: open_link(YOUTUBE_URL),
+    bg=BTN,
+    fg=TEXT,
+    activebackground=BTN_HOVER,
+    activeforeground=TEXT,
+    relief="flat",
+    borderwidth=0,
+    cursor="hand2"
 )
 btn_youtube.pack(side="left", padx=(20, 0))
 
 btn_copy_yt = tk.Button(
     socials_row,
     image=copy_icon,
-    command=lambda: copy_link(YOUTUBE_URL)
+    command=lambda: copy_link(YOUTUBE_URL),
+    bg=BTN,
+    fg=TEXT,
+    activebackground=BTN_HOVER,
+    activeforeground=TEXT,
+    relief="flat",
+    borderwidth=0,
+    cursor="hand2"
 )
 btn_copy_yt.pack(side="left", padx=5)
 
@@ -511,20 +628,40 @@ def set_hotkey(action, key):
     refresh_ui()
 
 def create_hotkey_row(label, action):
-    frame = tk.Frame(hotkey_frame)
+    frame = tk.Frame(
+        hotkey_frame,
+        cursor="hand2",
+        bg=CARD,
+        relief="flat",
+        borderwidth=0
+    )
     frame.pack(pady=5)
 
     tk.Label(
         frame,
         text=label,
         width=20,
-        anchor="w"
+        anchor="w",
+        bg=CARD,
+        fg=TEXT,
+        activebackground=BTN_HOVER,
+        activeforeground=TEXT,
+        relief="flat",
+        borderwidth=0,
+        cursor="hand2"
     ).pack(side="left")
 
     key_label = tk.Label(
         frame,
         text=hotkeys[action],
-        width=25
+        width=25,
+        bg=CARD,
+        fg=TEXT,
+        activebackground=BTN_HOVER,
+        activeforeground=TEXT,
+        relief="flat",
+        borderwidth=0,
+        cursor="hand2"
     )
     key_label.pack(side="left")
 
@@ -534,7 +671,14 @@ def create_hotkey_row(label, action):
     tk.Button(
         frame,
         text="Change",
-        command=start_rebind
+        command=start_rebind,
+        bg=BTN,
+        fg=TEXT,
+        activebackground=BTN_HOVER,
+        activeforeground=TEXT,
+        relief="flat",
+        borderwidth=0,
+        cursor="hand2"
     ).pack(side="left")
 
 def begin_hotkey_capture(action, label_widget):
@@ -623,14 +767,18 @@ refresh_hotkey_labels()
 # =========================
 # GUI PREVIEW WINDOW
 # =========================
-frame = tk.Frame(main_frame)
+frame = tk.Frame(main_frame, bg=CARD)
 frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-scrollbar = tk.Scrollbar(frame)
+scrollbar = tk.Scrollbar(frame, bg=BTN, troughcolor=BG)
 
 preview_text = tk.Text(
     frame,
     font=("Consolas", 11),
+    bg="#252526",
+    fg="#d4d4d4",
+    insertbackground="white",
+    relief="flat",
     yscrollcommand=scrollbar.set
 )
 
@@ -645,7 +793,13 @@ preview_text.pack(side="left", fill="both", expand=True)
 def build_hotkey_screen():
     for widget in hotkey_frame.winfo_children():
         widget.destroy()
-    tk.Label(hotkey_frame, text="Hotkey Settings", font=("Arial", 20)).pack(pady=10)
+    tk.Label(
+        hotkey_frame,
+        text="Hotkey Settings",
+        font=("Segoe UI", 20, "bold"),
+        bg=BG,
+        fg=TEXT
+    ).pack(pady=10)
 
     create_hotkey_row("Condition", "condition")
     create_hotkey_row("Option", "option")
@@ -656,7 +810,14 @@ def build_hotkey_screen():
         hotkey_frame,
         text="Назад/Back",
         command=show_main,
-        font = ("Consolas", 20)
+        font=("Arial", 15),
+        bg=BTN,
+        fg=TEXT,
+        activebackground=BTN_HOVER,
+        activeforeground=TEXT,
+        relief="flat",
+        borderwidth=0,
+        cursor="hand2"
     ).pack(pady=20)
 
 def show_main():
@@ -693,22 +854,41 @@ def build_donate_screen():
     tk.Label(
         donate_frame,
         text="Донаты/Donations",
-        font=("Arial", 22)
+        font = ("Segoe UI", 26, "bold"),
+        bg = BG,
+        fg = TEXT
     ).pack(pady=10)
 
     for name, icon, address in DONATE_DATA:
-        row = tk.Frame(donate_frame)
+        row = tk.Frame(
+            donate_frame,
+            cursor="hand2",
+            bg=CARD,
+            borderwidth=0
+        )
         row.pack(anchor="center", pady=5)
 
-        icon_label = tk.Label(row, image=icon)
+        icon_label = tk.Label(
+            row,
+            image=icon,
+            fg=TEXT,
+            cursor="hand2",
+            bg=CARD,
+            borderwidth=0
+        )
         icon_label.pack(side="left", padx=5)
 
         addr_label = tk.Label(
             row,
             text=address,
-            fg="blue",
+            fg=TEXT,
             cursor="hand2",
-            font=("Consolas", 11)
+            font=("Consolas", 11),
+            bg=BTN_HOVER,
+            activebackground=BTN_HOVER,
+            activeforeground=TEXT,
+            relief="flat",
+            borderwidth=0
         )
         addr_label.pack(side="left", padx=5)
 
@@ -742,14 +922,28 @@ def build_donate_screen():
         donate_frame,
         text="Назад/Back",
         command=show_main,
-        font = ("Consolas", 20)
+        font=("Arial", 15),
+        bg=BTN,
+        fg=TEXT,
+        activebackground=BTN_HOVER,
+        activeforeground=TEXT,
+        relief="flat",
+        borderwidth=0,
+        cursor="hand2"
     ).pack(pady=20)
 
 hotkey_btn = tk.Button(
     main_frame,
     text="Hotkeys",
     command=show_hotkeys,
-    font = ("Arial", 15)
+    font = ("Arial", 15),
+    bg=BTN,
+    fg=TEXT,
+    activebackground=BTN_HOVER,
+    activeforeground=TEXT,
+    relief="flat",
+    borderwidth=0,
+    cursor="hand2"
 )
 hotkey_btn.place(x=10, y=10)
 
