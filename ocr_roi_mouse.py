@@ -487,6 +487,10 @@ def build_donate_screen() -> None:
         tk.Label(row, image=icon, fg=TEXT, cursor="hand2", bg=CARD, borderwidth=0).pack(
             side="left", padx=5
         )
+        if name != "BTC":
+            tk.Label(row, text="(Chain address - send any token)", fg=TEXT, cursor="hand2", bg=CARD, borderwidth=0).pack(
+                side="left", padx=5
+            )
 
         addr_label = tk.Label(
             row, text=address, fg=TEXT, cursor="hand2",
@@ -543,11 +547,11 @@ youtube_icon  = tk.PhotoImage(file=os.path.join("icons", "YT_icon.png"))
 # ── Donate data (must come after icons are loaded) ───────────────────────────
 DONATE_DATA = [
     ("BTC",            btc_icon,  "bc1qnjv8d2ecf3uwwugdf3jlxyc020e2ztc8s0zghv"),
-    ("ETH (any token)", eth_icon, "0x108e08febfbe3e47a9c15e484fd6587f4a0c6279"),
-    ("BNB (any token)", bnb_icon, "0x108e08febfbe3e47a9c15e484fd6587f4a0c6279"),
-    ("SOL (any token)", sol_icon, "GEgnqADD4WJTDz1syRMyaK9qjn2jhhEknhreoZwWXT9T"),
-    ("TON (any token)", ton_icon, "UQBZb8OHkXr08m1CWM_eGX40TMbeIUAVEWQeMLKl8RWZ2462"),
-    ("TRX (any token)", tron_icon,"TJxdGZTtp9MeXF2EijYAR4BK5wNH99kJgW"),
+    ("ETH", eth_icon, "0x108e08febfbe3e47a9c15e484fd6587f4a0c6279"),
+    ("BNB", bnb_icon, "0x108e08febfbe3e47a9c15e484fd6587f4a0c6279"),
+    ("SOL", sol_icon, "GEgnqADD4WJTDz1syRMyaK9qjn2jhhEknhreoZwWXT9T"),
+    ("TON", ton_icon, "UQBZb8OHkXr08m1CWM_eGX40TMbeIUAVEWQeMLKl8RWZ2462"),
+    ("TRX", tron_icon,"TJxdGZTtp9MeXF2EijYAR4BK5wNH99kJgW"),
 ]
 
 # ── Main frame: header ────────────────────────────────────────────────────────
