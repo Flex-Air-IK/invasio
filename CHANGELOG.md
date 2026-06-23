@@ -7,7 +7,7 @@
 - Style to the app
 
 ### Notes
-Minor bugfixes, and major code refactoring
+Minor bugfixes, and major code refactoring, removed unused files
 ## [v1.1] - 2026-06-21
 
 ### Added
