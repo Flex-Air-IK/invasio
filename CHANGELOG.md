@@ -1,5 +1,13 @@
 # Changelog
+## [v1.2] - 2026-06-23
 
+### Added
+- GUI Hotkeys & Hotkey Bindings
+- Donations window
+- Style to the app
+
+### Notes
+Minor bugfixes, and major code refactoring
 ## [v1.1] - 2026-06-21
 
 ### Added
