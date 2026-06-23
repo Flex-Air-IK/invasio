@@ -710,6 +710,7 @@ def key_handler(event):
                 "Кнопка уже назначена/Button is already in use",
                 f"{new_key} уже используется!/{new_key} already in use!"
             )
+            label_widget.config(text=hotkeys[action])
             waiting_hotkey_action = None
             return
 
@@ -835,14 +836,10 @@ def show_hotkeys():
     hotkey_frame.pack(fill="both", expand=True)
 
 def on_esc(event):
-    if current_screen in ["hotkeys", "donate"]:
+    if current_screen != "main":
         show_main()
-
     if waiting_hotkey_action is not None:
         return
-
-    if current_screen == "hotkeys":
-        show_main()
 
 # =========================
 # DONATE SCREEN
