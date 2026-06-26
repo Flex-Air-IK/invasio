@@ -1,8 +1,8 @@
 import subprocess
 import json
 import os
+import sys
 import webbrowser
-
 import cv2
 import pytesseract
 import pyperclip
@@ -14,10 +14,28 @@ from PIL import Image
 # ===========================================================================
 # CONFIGURATION
 # ===========================================================================
+# Base dir
+if getattr(sys, 'frozen', False):
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    BASE_DIR = os.path.dirname(__file__)
+APP_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
+#Tesseract
+TESSERACT_PATH = os.path.join(APP_ROOT, "Tesseract-OCR", "tesseract.exe")
+pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
 
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+#scrcpy
+SCRCPY_PATH = os.path.join(APP_ROOT, "scrcpy", "scrcpy.exe")
+subprocess.Popen(SCRCPY_PATH)
 
-SETTINGS_FILE = "settings.json"
+def resource_path(relative_path):
+    if getattr(sys, 'frozen', False):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+SETTINGS_FILE = resource_path("settings.json")
 
 TELEGRAM_URL = "https://t.me/IK_Flex_Air"
 YOUTUBE_URL  = "https://www.youtube.com/@FlexAir-pwn"
@@ -90,9 +108,19 @@ def select_roi_scaled(image_path: str, scale: float = 0.5) -> str:
     Returns the path to the saved crop ("cropped.png").
     """
     img = cv2.imread(image_path)
+
+    if img is None:
+        print("ERROR: image not found")
+        return ""
+
     h, w = img.shape[:2]
 
     preview = cv2.resize(img, (int(w * scale), int(h * scale)))
+
+    cv2.namedWindow("Select area (Enter to confirm)", cv2.WINDOW_NORMAL)
+    cv2.imshow("Select area (ENTER to confirm)", preview)
+    cv2.waitKey(1)
+
     r = cv2.selectROI("Select area (ENTER to confirm)", preview, False, False)
     cv2.destroyAllWindows()
 
@@ -534,15 +562,15 @@ social_frame = tk.Frame(root, bg=BG)
 social_frame.place(x=800, y=10)
 
 # ── Icons ────────────────────────────────────────────────────────────────────
-btc_icon      = tk.PhotoImage(file="icons/btc_icon.png")
-eth_icon      = tk.PhotoImage(file="icons/etherium_icon.png")
-bnb_icon      = tk.PhotoImage(file="icons/bnb_icon.png")
-sol_icon      = tk.PhotoImage(file="icons/solana_icon.png")
-ton_icon      = tk.PhotoImage(file="icons/ton_icon.png")
-tron_icon     = tk.PhotoImage(file="icons/tron_icon.png")
-copy_icon     = tk.PhotoImage(file="icons/Copy_icon.png")
-telegram_icon = tk.PhotoImage(file=os.path.join("icons", "telegram_icon.png"))
-youtube_icon  = tk.PhotoImage(file=os.path.join("icons", "YT_icon.png"))
+btc_icon      = tk.PhotoImage(file="_internal/icons/btc_icon.png")
+eth_icon      = tk.PhotoImage(file="_internal/icons/etherium_icon.png")
+bnb_icon      = tk.PhotoImage(file="_internal/icons/bnb_icon.png")
+sol_icon      = tk.PhotoImage(file="_internal/icons/solana_icon.png")
+ton_icon      = tk.PhotoImage(file="_internal/icons/ton_icon.png")
+tron_icon     = tk.PhotoImage(file="_internal/icons/tron_icon.png")
+copy_icon     = tk.PhotoImage(file="_internal/icons/Copy_icon.png")
+telegram_icon = tk.PhotoImage(file="_internal/icons/telegram_icon.png")
+youtube_icon  = tk.PhotoImage(file="_internal/icons/YT_icon.png")
 
 # ── Donate data (must come after icons are loaded) ───────────────────────────
 DONATE_DATA = [

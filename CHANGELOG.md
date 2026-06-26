@@ -1,4 +1,13 @@
 # Changelog
+## [v1.3] - 2026-06-26
+
+### Added
+- .exe-setup
+- Readme.md file to the release
+
+### Notes
+Cleaned up the code a bit
+
 ## [v1.2] - 2026-06-23
 
 ### Added
